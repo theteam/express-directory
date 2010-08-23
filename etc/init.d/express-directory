@@ -1,0 +1,32 @@
+#!/bin/sh
+NAME=express-directory
+TARGET=app.js
+PORT=3000
+ENVIRONMENT=staging
+URI=$NAME.$ENVIRONMENT
+DIRECTORY=/mnt/apps/$ENVIRONMENT/$URI
+NODE=./bin/node
+
+case "$1" in
+  start)
+		lsof -i :$PORT
+		if [ $? -eq 0 ]; then
+			echo "The port "$PORT" is already in use"
+		else
+	        echo -n "Starting daemon: "$NAME
+			nohup $NODE -Dappname=$NAME $TARGET &
+	        echo "."
+		fi
+	;;
+  stop)
+        echo -n "Stopping daemon: "$NAME
+		ps -ef | grep $NAME | grep -v grep | awk '{print "kill " $2}' | sh
+       	echo "."
+	;;
+
+  *)
+	echo "Usage: "$1" {start|stop}"
+	exit 1
+esac
+
+exit 0

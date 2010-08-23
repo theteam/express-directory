@@ -1,0 +1,32 @@
+<project name="express-directory" default="default">
+	
+	<target name="default" depends="clean, setup, app.start, test.integration"/>
+	
+	<target name="clean">
+		<echo message="cleaning directory build"/>
+		<delete dir="./build"/>
+	</target>
+	
+	<target name="setup">
+		<echo message="creating build directory"/>
+		<mkdir dir="./build"/>
+		<copy todir="build">
+			<fileset dir=".">
+				<exclude name="build"/>
+			</fileset>
+		</copy>
+		<exec executable="ndistro" dir="build" failonerror="true"/>
+	</target>
+	
+	<target name="app.start">
+		<exec executable="./bin/node" dir="build" failonerror="true">
+			<arg value="app.js"/>
+			<arg value="-Dappname=express-directory"/>
+		</exec>
+	</target>
+	
+	<target name="test.integration">
+		
+	</target>
+		
+</project>
