@@ -1,6 +1,6 @@
 <project name="express-directory" default="default">
 	
-	<target name="default" depends="clean, setup, app.start, test.integration"/>
+	<target name="default" depends="clean, setup, app.start, test.integration, app.stop"/>
 	
 	<target name="clean">
 		<echo message="cleaning directory build"/>
@@ -19,14 +19,28 @@
 	</target>
 	
 	<target name="app.start">
-		<exec executable="./bin/node" dir="build" failonerror="true">
-			<arg value="app.js"/>
-			<arg value="-Dappname=express-directory"/>
+		<exec executable="chmod" dir="build">
+			<arg value="+x"/>
+			<arg value="./etc/init.d/express-directory"/>
 		</exec>
+		<exec executable="./etc/init.d/express-directory" dir="build" failonerror="true">
+			<arg value="start"/>
+		</exec>
+		<echo message="Checking and waiting on port 3000"/>
+		<waitfor maxwait="180" maxwaitunit="second" checkevery="5" checkeveryunit="second" timeoutproperty="deploy.failed">
+			<socket server="localhost" port="3000"/>
+		</waitfor>
+		<fail if="deploy.failed" message="Timed out waiting for deploy"/>
 	</target>
 	
 	<target name="test.integration">
 		
+	</target>
+	
+	<target name="app.stop">
+		<exec executable="./etc/init.d/express-directory" dir="build">
+			<arg value="stop"/>
+		</exec>
 	</target>
 		
 </project>
